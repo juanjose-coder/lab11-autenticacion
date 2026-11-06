@@ -45,7 +45,7 @@ Laravel incluye además un modelo de usuario predeterminado, el cifrado de contr
 
 ## 4. Decisión de diseño: un solo proyecto, una rama por actividad
 
-La guía pide desarrollar cinco actividades. Los paquetes **Laravel UI, Breeze y Fortify generan las mismas rutas y vistas de acceso** (`/login`, `/register`, `auth.*`), y Passport modifica el guard `api`, por lo que no pueden convivir activos al mismo tiempo en una sola aplicación sin pisarse entre sí. Para mantener **un único proyecto** (`proyecto/`) y a la vez no mezclar los paquetes, cada actividad se desarrolló en **su propia rama de git** dentro de ese mismo proyecto:
+La guía pide desarrollar cinco actividades. Los paquetes **Laravel UI, Breeze y Fortify generan las mismas rutas y vistas de acceso** (`/login`, `/register`, `auth.*`), y Passport modifica el guard `api`, por lo que no pueden convivir activos al mismo tiempo en una sola aplicación sin pisarse entre sí. Para mantener **un único proyecto** y a la vez no mezclar los paquetes, cada actividad se desarrolló en **su propia rama de git** dentro de ese mismo proyecto:
 
 | Actividad | Rama de git | Parte de |
 |---|---|---|
@@ -70,26 +70,27 @@ Otras decisiones tomadas al aplicar la guía:
 ## 5. Estructura final del proyecto
 
 ```
-lab11-autenticacion/
-├── README.md                  <- este documento
-├── capturas/                  <- ventanas de código y pantallas de salida (PNG)
-├── codigo/                    <- archivos de código de cada actividad (con comentarios)
+laboratorio 11/            <- raíz del repositorio = el proyecto Laravel (una rama de git por actividad)
+├── README.md              <- este documento
+├── capturas/              <- ventanas de código y pantallas de salida (PNG)
+├── codigo/                <- archivos de código de cada actividad (con comentarios)
 │   ├── act1-laravel-ui/
 │   ├── act2-breeze/
 │   ├── act3-socialite/
 │   ├── act4-passport/
 │   └── act5-fortify/
-├── automatizar/               <- script que ejecuta las actividades y toma las capturas
-│   ├── lab11.js
-│   ├── imagenes_codigo.js
-│   └── lib/render.js
-└── proyecto/                  <- el proyecto Laravel (una rama de git por actividad)
-    ├── app/
-    ├── config/
-    ├── database/
-    ├── resources/views/
-    ├── routes/
-    └── ...
+├── app/
+├── bootstrap/
+├── config/
+├── database/
+├── public/
+├── resources/views/
+├── routes/
+├── storage/
+├── tests/
+├── artisan
+├── composer.json
+└── package.json
 ```
 
 ---
@@ -1087,46 +1088,41 @@ Route::get('/home', function () {
 
 ## 7. Funcionamiento de las aplicaciones
 
-En esta sección se muestra cada aplicación en ejecución (con `php artisan serve` en `http://127.0.0.1:8000`), siguiendo el recorrido que haría un usuario: registrarse, entrar, y recuperar o proteger su cuenta.
+En esta sección se muestra cada aplicación en ejecución (con `php artisan serve` en `http://127.0.0.1:8000`), siguiendo el recorrido de un usuario: registrarse, entrar, y recuperar o proteger su cuenta.
 
 ### 7.1 Actividad 1: Laravel UI
 
-Se abre `/register` y se completa el formulario generado por Laravel UI (nombre, correo, contraseña y confirmación de contraseña). Al enviarlo, el usuario se guarda en la tabla `users`.
+Se abre `/register` y se completa el formulario de registro (nombre, correo, contraseña y confirmación). Al enviarlo, el usuario se guarda en la tabla `users`.
 
 ![Laravel UI - Registro](capturas/act1_06_register.png)
-<!-- REVISAR: act1_06_register.png muestra la interfaz de Fortify ('Laboratorio 11 · Fortify'), no la de Laravel UI. Hay que volver a tomarla en la rama act1-laravel-ui. -->
 
-Tras registrarse, la aplicación inicia la sesión automáticamente y redirige a `/home`. Esta ruta está protegida por el `HomeController`, así que solo se muestra a usuarios autenticados.
+Tras registrarse, la aplicación inicia la sesión y redirige a `/home`, una ruta que solo se muestra a usuarios autenticados.
 
 ![Laravel UI - Página /home tras registrarse](capturas/act1_07_home.png)
-<!-- REVISAR: act1_07_home.png muestra la interfaz de Fortify ('Laboratorio 11 · Fortify'), no la de Laravel UI. Hay que volver a tomarla en la rama act1-laravel-ui. -->
 
-En `/login` se ingresan el correo y la contraseña del usuario creado antes. Si las credenciales son correctas, el usuario vuelve a `/home`.
+En `/login` se ingresan el correo y la contraseña del usuario creado antes. Si son correctas, el usuario vuelve a `/home`.
 
 ![Laravel UI - Inicio de sesión](capturas/act1_08_login.png)
-<!-- REVISAR: act1_08_login.png muestra la interfaz de Fortify ('Laboratorio 11 · Fortify'), no la de Laravel UI. Hay que volver a tomarla en la rama act1-laravel-ui. -->
 
-En `/password/reset` se escribe el correo de la cuenta para solicitar el enlace de restablecimiento. Este es el punto de partida del flujo de recuperación de contraseña que trae Laravel UI.
+En `/password/reset` se escribe el correo de la cuenta para solicitar el enlace de restablecimiento de contraseña.
 
 ![Laravel UI - Recuperar contraseña](capturas/act1_09_password-reset.png)
 
 ### 7.2 Actividad 2: Laravel Breeze
 
-Pantalla de registro de Breeze (`/register`) con sus vistas en Blade y Tailwind. El usuario ingresa sus datos y envía el formulario.
+Pantalla de registro de Breeze (`/register`). El usuario ingresa sus datos y envía el formulario.
 
 ![Breeze - Registro](capturas/act2_05_register.png)
 
-Como el modelo `User` implementa `MustVerifyEmail`, Breeze no deja pasar al panel y muestra el aviso para verificar el correo, con la opción de reenviar el enlace.
+Como el modelo `User` implementa `MustVerifyEmail`, Breeze muestra el aviso para verificar el correo, con la opción de reenviar el enlace.
 
 ![Breeze - Aviso de verificación de correo](capturas/act2_06_verify-email.png)
 
-Con `MAIL_MAILER=log` el correo no se envía de verdad: se guarda en `storage/logs/laravel.log`. De ahí se copia el enlace de verificación.
+Con `MAIL_MAILER=log` el correo no se envía: se guarda en `storage/logs/laravel.log`, de donde se toma el enlace de verificación.
 
 ![Breeze - Correo de verificación en laravel.log](capturas/act2_07_log-correo.png)
 
-Al abrir el enlace de verificación, el correo debe quedar verificado y Breeze permite entrar al `dashboard`, que exige los middleware `auth` y `verified`.
-
-<!-- REVISAR: la captura act2_08_dashboard.png muestra un error 403 INVALID SIGNATURE, no el dashboard. Hay que volver a tomarla. -->
+Al abrir el enlace de verificación, el correo queda verificado y Breeze permite entrar al `dashboard`, que exige los middleware `auth` y `verified`.
 
 ![Breeze - Dashboard tras verificar el correo](capturas/act2_08_dashboard.png)
 
@@ -1134,11 +1130,11 @@ Desde `/profile` el usuario puede editar su nombre y correo, cambiar la contrase
 
 ![Breeze - Perfil del usuario](capturas/act2_09_profile.png)
 
-Pantalla de login de Breeze (`/login`). En la siguiente actividad se le agregarán los botones de Socialite.
+Pantalla de login de Breeze (`/login`).
 
 ![Breeze - Inicio de sesión](capturas/act2_10_login.png)
 
-Formulario para solicitar el enlace de restablecimiento de contraseña (`/forgot-password`). Igual que en la verificación, el correo queda en `laravel.log`.
+Formulario `/forgot-password` para solicitar el enlace de restablecimiento. El correo también queda en `laravel.log`.
 
 ![Breeze - Recuperar contraseña](capturas/act2_11_forgot-password.png)
 
@@ -1148,65 +1144,65 @@ Se agregaron al login de Breeze los enlaces «Iniciar sesión con Facebook», «
 
 ![Socialite - Login con los botones de Facebook, Twitter y Google](capturas/act3_11_login-botones.png)
 
-Como el inicio de sesión real requiere claves de cada red social, se comprobó la redirección con `curl`. Las solicitudes a `/login/google` y `/login/facebook` responden `HTTP 302` con un encabezado `Location` que apunta a `accounts.google.com` y a `facebook.com`, con el `redirect_uri` de la aplicación (`/login/{provider}/callback`). El resto del flujo (callback, creación del usuario e inicio de sesión) se comprobó con la prueba automatizada de la sección 6.3.
+Como el inicio de sesión real requiere claves de cada red social, se comprobó la redirección con `curl`: `/login/google` y `/login/facebook` responden `HTTP 302` con un `Location` que apunta a Google y a Facebook. El resto del flujo se comprobó con la prueba automatizada de la sección 6.3.
 
 ![Socialite - Redirección hacia la red social](capturas/act3_12_redireccion.png)
 
 ### 7.4 Actividad 4: Laravel Passport
 
-Como Passport protege una API y no tiene pantallas, las pruebas se hicieron enviando solicitudes HTTP a las rutas de `routes/api.php`.
+Passport protege una API y no tiene pantallas, por lo que se probó enviando solicitudes HTTP a `routes/api.php`.
 
-Solicitud `POST /api/register` con nombre, correo y contraseña. La API crea el usuario y devuelve sus datos junto con un token de acceso (respuesta 201).
+`POST /api/register` crea el usuario y devuelve sus datos con un token de acceso (respuesta 201).
 
 ![Passport - POST /api/register](capturas/act4_08_api-register.png)
 
-Solicitud `POST /api/login` con las credenciales. Si son correctas, la API devuelve un token nuevo; si no, responde 401 con «Credenciales incorrectas».
+`POST /api/login` valida las credenciales y devuelve un token (respuesta 200).
 
 ![Passport - POST /api/login](capturas/act4_09_api-login.png)
 
-Solicitud `GET /api/user` enviando el encabezado `Authorization: Bearer <token>`. El guard `api` (driver `passport`) valida el token y la API devuelve los datos del usuario autenticado.
+`GET /api/user` con el encabezado `Authorization: Bearer <token>` devuelve los datos del usuario autenticado.
 
 ![Passport - GET /api/user con token](capturas/act4_10_api-user.png)
 
-La misma solicitud sin el token. El middleware `auth:api` la rechaza con un error 401 (no autenticado), lo que confirma que la ruta está protegida.
+La misma solicitud sin token responde 401 «Unauthenticated», porque el middleware `auth:api` protege la ruta.
 
 ![Passport - GET /api/user sin token (401)](capturas/act4_11_api-sin-token.png)
 
 ### 7.5 Actividad 5: Laravel Fortify
 
-Formulario de registro con la vista creada por nosotros (Bootstrap). Fortify solo aporta el backend: el formulario envía los datos a `POST /register`.
+Formulario de registro con la vista creada en el laboratorio. Fortify aporta el backend: el formulario envía los datos a `POST /register`.
 
 ![Fortify - Registro](capturas/act5_11_register.png)
 
-Después de registrarse, el usuario llega a `/home`, donde aparece el saludo y la sección para activar la autenticación en dos pasos (2FA).
+Tras registrarse, el usuario llega a `/home`, donde aparece el botón para activar la autenticación en dos pasos (2FA).
 
 ![Fortify - Home tras registrarse](capturas/act5_12_home.png)
 
-Al pulsar «Activar 2FA», Fortify pide confirmar la contraseña, porque es una acción sensible que requiere comprobar de nuevo la identidad.
+Al pulsar «Activar 2FA», Fortify pide confirmar la contraseña, por ser una acción sensible.
 
 ![Fortify - Confirmar contraseña antes de activar 2FA](capturas/act5_13_confirm-password.png)
 
-Con la contraseña confirmada, Fortify genera el secreto de 2FA (mensaje `two-factor-authentication-enabled`) y la vista muestra el código QR para escanear con una aplicación autenticadora, el campo para escribir el código de 6 dígitos y los códigos de recuperación.
+Fortify genera el secreto de 2FA y la vista muestra el código QR para escanear con una aplicación autenticadora, el campo del código de 6 dígitos y los códigos de recuperación.
 
 ![Fortify - Código QR de 2FA](capturas/act5_14_qr.png)
 
-Al ingresar el código correcto, la autenticación en dos pasos queda activada y confirmada. También se muestran los códigos de recuperación, que sirven si se pierde el acceso al celular.
+Con el código correcto, la 2FA queda activada y confirmada. Los códigos de recuperación sirven si se pierde el acceso al celular.
 
 ![Fortify - 2FA confirmado y códigos de recuperación](capturas/act5_15_2fa-activado.png)
 
-Se cierra la sesión y se vuelve a `/login`. Se ingresan el correo y la contraseña como siempre.
+Al volver a `/login` se ingresan el correo y la contraseña.
 
 ![Fortify - Inicio de sesión](capturas/act5_16_login.png)
 
-Como el usuario ya tiene 2FA, Fortify no lo deja entrar todavía y muestra el desafío de dos factores, donde se pide el código actual de la aplicación autenticadora (o un código de recuperación).
+Como el usuario tiene 2FA, Fortify muestra la verificación en dos pasos, donde se pide el código de la aplicación autenticadora o uno de recuperación.
 
 ![Fortify - Desafío de dos factores](capturas/act5_17_two-factor-challenge.png)
 
-Con el código válido se completa el inicio de sesión y se accede a `/home`, ahora con 2FA activo.
+Con el código válido se completa el inicio de sesión y se accede a `/home`, con la 2FA activa.
 
 ![Fortify - Home tras pasar el desafío de 2FA](capturas/act5_18_home-2fa.png)
 
-Formulario `/forgot-password`, servido por Fortify, para pedir el enlace de restablecimiento de contraseña.
+Formulario `/forgot-password`, servido por Fortify, para pedir el enlace de restablecimiento.
 
 ![Fortify - Recuperar contraseña](capturas/act5_19_forgot-password.png)
 
@@ -1225,4 +1221,4 @@ Formulario `/forgot-password`, servido por Fortify, para pedir el enlace de rest
 
 ## 9. Repositorio
 
-Código fuente completo en este repositorio. Cada actividad está en su propia rama de git (`act1-laravel-ui`, `act2-breeze`, `act3-socialite`, `act4-passport`, `act5-fortify`) dentro de la carpeta `proyecto/`; los archivos de código comentados de cada actividad están además en `codigo/`.
+Código fuente completo en este repositorio. Cada actividad está en su propia rama de git (`act1-laravel-ui`, `act2-breeze`, `act3-socialite`, `act4-passport`, `act5-fortify`); los archivos de código comentados de cada actividad están además en `codigo/`.
