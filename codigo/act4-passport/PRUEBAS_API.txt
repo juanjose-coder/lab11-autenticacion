@@ -1,0 +1,12 @@
+# Probar la API de Passport (con el servidor corriendo: php artisan serve)
+
+curl -X POST http://127.0.0.1:8000/api/register -H "Accept: application/json" ^
+  -d "name=Demo&email=demo@lab11.test&password=Password123"
+
+curl -X POST http://127.0.0.1:8000/api/login -H "Accept: application/json" ^
+  -d "email=demo@lab11.test&password=Password123"
+
+curl http://127.0.0.1:8000/api/user -H "Accept: application/json" -H "Authorization: Bearer TU_TOKEN"
+
+# Sin token debe responder 401 Unauthenticated
+curl http://127.0.0.1:8000/api/user -H "Accept: application/json"

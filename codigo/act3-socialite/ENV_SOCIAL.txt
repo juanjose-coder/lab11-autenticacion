@@ -1,0 +1,12 @@
+# Agregar al final del archivo .env (reemplaza por las claves reales de cada red social)
+FACEBOOK_CLIENT_ID=your-client-id
+FACEBOOK_CLIENT_SECRET=your-client-secret
+FACEBOOK_REDIRECT_URI=http://127.0.0.1:8000/login/facebook/callback
+
+TWITTER_CLIENT_ID=your-client-id
+TWITTER_CLIENT_SECRET=your-client-secret
+TWITTER_REDIRECT_URI=http://127.0.0.1:8000/login/twitter/callback
+
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/login/google/callback
