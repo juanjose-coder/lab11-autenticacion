@@ -1,0 +1,1 @@
+{"version":2,"defects":[],"times":{"Tests\\Feature\\SocialAuthTest::test_callback_de_google_crea_usuario_y_autentica":0.182,"Tests\\Feature\\SocialAuthTest::test_proveedor_no_permitido_devuelve_404":0.049}}

@@ -44,4 +44,5 @@
             </x-primary-button>
         </div>
     </form>
+    @include('auth.botones-sociales')
 </x-guest-layout>

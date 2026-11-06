@@ -1,25 +1,30 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Breeze: el panel solo se muestra a usuarios autenticados ('auth')
-// y con el correo verificado ('verified', solo aplica si User implementa MustVerifyEmail).
+// --- Laravel Socialite ---
+// {provider} puede ser facebook, twitter o google.
+// Se nombran 'social.redirect' y 'social.callback' (y no 'login') porque Breeze ya usa
+// el nombre 'login' para la pantalla de acceso con correo y contraseña.
+Route::get('login/{provider}', [SocialAuthController::class, 'redirectToProvider'])
+    ->name('social.redirect');
+Route::get('login/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])
+    ->name('social.callback');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Rutas del perfil del usuario: editar datos, cambiar contraseña y eliminar cuenta.
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// routes/auth.php lo genera "php artisan breeze:install":
-// contiene login, registro, recuperar contraseña, verificar correo y confirmar contraseña.
 require __DIR__.'/auth.php';

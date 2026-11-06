@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-// Para exigir la verificación del correo basta con implementar MustVerifyEmail.
-// Con MAIL_MAILER=log el enlace de verificación se guarda en storage/logs/laravel.log
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password'];
+    // Se agregan provider y provider_id para poder asignarlos en masa desde el controlador.
+    protected $fillable = ['name', 'email', 'password', 'provider', 'provider_id'];
 
     protected $hidden = ['password', 'remember_token'];
 
