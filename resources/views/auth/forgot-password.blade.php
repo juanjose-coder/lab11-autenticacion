@@ -1,14 +1,25 @@
-@extends('layouts.app')
-@section('title', 'Recuperar contraseña')
-@section('content')
-<div class="card shadow-sm"><div class="card-body">
-    <h4 class="mb-3">Recuperar contraseña</h4>
-    {{-- Con MAIL_MAILER=log el enlace de restablecimiento queda en storage/logs/laravel.log --}}
-    <form method="POST" action="/forgot-password">
+<x-guest-layout>
+    <div class="mb-4 text-sm text-gray-600">
+        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    </div>
+
+    <!-- Session Status -->
+    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+    <form method="POST" action="{{ route('password.email') }}">
         @csrf
-        <div class="mb-3"><label class="form-label">Correo</label>
-            <input type="email" name="email" value="{{ old('email') }}" class="form-control" required autofocus></div>
-        <button class="btn btn-primary w-100">Enviar enlace</button>
+
+        <!-- Email Address -->
+        <div>
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <div class="flex items-center justify-end mt-4">
+            <x-primary-button>
+                {{ __('Email Password Reset Link') }}
+            </x-primary-button>
+        </div>
     </form>
-</div></div>
-@endsection
+</x-guest-layout>
