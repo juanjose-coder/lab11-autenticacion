@@ -2,17 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Fortify registra por su cuenta /login, /register, /logout, /forgot-password,
+// /reset-password, /user/confirm-password, /two-factor-challenge, /user/two-factor-authentication...
+// Aquí solo definimos la página a la que llega el usuario autenticado.
+Route::get('/home', function () {
+    return view('home');
+})->middleware('auth')->name('home');
